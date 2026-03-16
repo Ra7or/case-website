@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>案例管理后台</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'>⚙️</svg>">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #4CAF50;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --text: #333;
+            --text-light: #666;
+            --bg: #f5f5f5;
+            --card-bg: #fff;
+            --radius: 12px;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        header {
+            background: var(--primary);
+            color: #fff;
+            padding: 1.25rem;
+        }
+        header h1 { font-size: 1.5rem; }
+        header a { color: #fff; text-decoration: none; opacity: 0.8; }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 1.25rem; }
+        
+        .btn {
+            padding: 0.75rem 1.25rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .btn:hover, .btn:focus { opacity: 0.9; }
+        .btn-secondary { background: var(--text-light); }
+        .btn-danger { background: var(--danger); }
+        .btn-warning { background: var(--warning); color: #000; }
+        
+        .form {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.25rem;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+        .form.show { display: block; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.375rem; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .tab {
+            padding: 0.625rem 1.25rem;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .tab.active { background: var(--accent); color: #fff; }
+        
+        .case-item {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        .case-item h4 { margin-bottom: 0.25rem; font-size: 1rem; }
+        .case-item p { color: var(--text-light); font-size: 0.875rem; }
+        .actions button {
+            padding: 0.375rem 0.75rem;
+            margin-left: 0.375rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        
+        @media (max-width: 600px) {
+            .case-item { flex-direction: column; align-items: flex-start; }
+            .actions { margin-top: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚙️ 管理后台</h1>
+    </header>
+    <div class="container">
+        <button class="btn" onclick="showForm()">+ 添加案例</button>
+        
+        <section id="form" class="form" aria-label="案例表单">
+            <h3 id="formTitle" style="margin-bottom:1rem;">添加案例</h3>
+            <form id="caseForm">
+                <input type="hidden" id="editIdx">
+                <div class="form-group">
+                    <label for="industry">行业</label>
+                    <select id="industry" required>
+                        <option value="物流">📦 物流行业</option>
+                        <option value="机器人">🤖 机器人行业</option>
+                        <option value="食品">🍪 食品行业</option>
+                        <option value="服装">👕 服装行业</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="title">标题</label>
+                    <input type="text" id="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="desc">描述</label>
+                    <input type="text" id="desc">
+                </div>
+                <div class="form-group">
+                    <label for="product">产品</label>
+                    <input type="text" id="product">
+                </div>
+                <div class="form-group">
+                    <label for="brand">品牌</label>
+                    <input type="text" id="brand">
+                </div>
+                <div class="form-group">
+                    <label for="scheme">方案</label>
+                    <input type="text" id="scheme">
+                </div>
+                <div class="form-group">
+                    <label for="tags">标签（逗号分隔）</label>
+                    <input type="text" id="tags" placeholder="物流, 分拣, 机器人">
+                </div>
+                <div class="form-group">
+                    <label for="media">视频文件</label>
+                    <select id="media"><option value="">无</option></select>
+                </div>
+                <button type="submit" class="btn">保存</button>
+                <button type="button" class="btn btn-secondary" onclick="hideForm()">取消</button>
+            </form>
+        </section>
+
+        <nav class="tabs" id="tabs" role="tablist" aria-label="行业分类"></nav>
+        <div id="list" role="region" aria-label="案例列表"></div>
+    </div>
+
+    <script>
+        let currentIndustry = '物流';
+        
+        const defaultData = {
+            "物流": [
+                {title:"物流_分拣_交叉带_2D视觉",date:"2026-03-16",desc:"物流行业，分拣场景",icon:"📦",tags:["物流","分拣","交叉带"],product:"2D视觉",brand:"康耐视",scheme:"交叉带方案",media:"物流_分拣_交叉带_2D视觉.mov"},
+                {title:"物流_分拣_供包_机器人",date:"2026-03-16",desc:"物流行业，供包场景",icon:"📦",tags:["物流","分拣","供包"],product:"机器人",scheme:"供包方案",media:"物流_分拣_供包_机器人.mp4"}
+            ],
+            "机器人": [
+                {title:"机器人_引导_上料_3D视觉",date:"2026-03-16",desc:"机器人行业，上料场景",icon:"🤖",tags:["机器人","引导","上料"],product:"3D视觉",brand:"梅卡曼德",scheme:"上料方案",media:"机器人_引导_上料_3D视觉.mov"}
+            ],
+            "食品": [
+                {title:"食品_包装_纸盒_机器人",date:"2026-03-16",desc:"食品行业，包装场景",icon:"🍪",tags:["食品","包装"],product:"机器人",scheme:"纸盒方案",media:"食品_包装_纸盒_机器人.mp4"}
+            ],
+            "服装": [
+                {title:"服装_质检_整理_人形机器人",date:"2026-03-16",desc:"服装行业，质检场景",icon:"👕",tags:["服装","质检"],product:"人形机器人",scheme:"整理方案",media:"服装_质检_整理_人形机器人.mp4"}
+            ]
+        };
+
+        function loadData() {
+            const saved = localStorage.getItem('casesData');
+            return saved ? JSON.parse(saved) : defaultData;
+        }
+
+        function saveData(data) {
+            localStorage.setItem('casesData', JSON.stringify(data));
+            render();
+        }
+
+        function render() {
+            const data = loadData();
+            
+            // tabs
+            const tabs = document.getElementById('tabs');
+            tabs.innerHTML = Object.keys(data).map(k => 
+                `<button class="tab ${k===currentIndustry?'active':''}" onclick="currentIndustry='${k}';render()" role="tab" aria-selected="${k===currentIndustry}">${k}</button>`
+            ).join('');
+            
+            // list
+            const list = document.getElementById('list');
+            const cases = data[currentIndustry] || [];
+            list.innerHTML = cases.length ? cases.map((c, i) => `
+                <article class="case-item">
+                    <div>
+                        <h4>${c.icon||'📦'} ${c.title}</h4>
+                        <p>${c.desc}</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-warning" onclick="edit(${i})" aria-label="编辑">编辑</button>
+                        <button class="btn-danger" onclick="del(${i})" aria-label="删除">删除</button>
+                    </div>
+                </article>
+            `).join('') : '<p style="text-align:center;color:#999;padding:2rem;">暂无案例</p>';
+        }
+
+        function showForm() {
+            document.getElementById('formTitle').textContent = '添加案例';
+            document.getElementById('caseForm').reset();
+            document.getElementById('editIdx').value = '';
+            document.getElementById('industry').value = currentIndustry;
+            document.getElementById('form').classList.add('show');
+        }
+
+        function hideForm() {
+            document.getElementById('form').classList.remove('show');
+        }
+
+        function edit(idx) {
+            const data = loadData();
+            const c = data[currentIndustry][idx];
+            document.getElementById('formTitle').textContent = '编辑案例';
+            document.getElementById('industry').value = currentIndustry;
+            document.getElementById('title').value = c.title;
+            document.getElementById('desc').value = c.desc || '';
+            document.getElementById('product').value = c.product || '';
+            document.getElementById('brand').value = c.brand || '';
+            document.getElementById('scheme').value = c.scheme || '';
+            document.getElementById('tags').value = (c.tags||[]).join(', ');
+            document.getElementById('media').value = c.media || '';
+            document.getElementById('editIdx').value = idx;
+            document.getElementById('form').classList.add('show');
+        }
+
+        function del(idx) {
+            if (!confirm('确定删除？')) return;
+            const data = loadData();
+            data[currentIndustry].splice(idx, 1);
+            saveData(data);
+        }
+
+        document.getElementById('caseForm').onsubmit = function(e) {
+            e.preventDefault();
+            const data = loadData();
+            const newCase = {
+                title: document.getElementById('title').value,
+                desc: document.getElementById('desc').value,
+                icon: '📦',
+                tags: document.getElementById('tags').value.split(',').map(t=>t.trim()).filter(t=>t),
+                product: document.getElementById('product').value,
+                brand: document.getElementById('brand').value,
+                scheme: document.getElementById('scheme').value,
+                media: document.getElementById('media').value,
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            const idx = document.getElementById('editIdx').value;
+            const industry = document.getElementById('industry').value;
+            
+            if (idx !== '') {
+                data[currentIndustry][parseInt(idx)] = newCase;
+            } else {
+                if (!data[industry]) data[industry] = [];
+                data[industry].push(newCase);
+            }
+            
+            saveData(data);
+            hideForm();
+        };
+
+        render();
+    </script>
+</body>
+</html>

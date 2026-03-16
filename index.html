@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>自动化案例库</title>
+    <meta name="description" content="物流、机器人、食品、服装行业自动化案例展示">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'>📦</svg>">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #4CAF50;
+            --text: #333;
+            --text-light: #666;
+            --bg: #f5f5f5;
+            --card-bg: #fff;
+            --radius: 12px;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --spacing: 1rem;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        header {
+            background: var(--primary);
+            color: #fff;
+            padding: 1.25rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header h1 { font-size: 1.5rem; text-align: center; }
+        nav { 
+            display: flex; 
+            justify-content: center; 
+            gap: 1rem; 
+            margin-top: 0.75rem;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            opacity: 0.8;
+            font-size: 0.875rem;
+        }
+        nav a:hover { opacity: 1; }
+        
+        main { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 1.25rem;
+        }
+        
+        /* 行业卡片 */
+        .industry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+        .industry-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .industry-card:hover, .industry-card:focus {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .industry-card .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .industry-card h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
+        .industry-card p { color: var(--text-light); font-size: 0.875rem; }
+        
+        /* 返回按钮 */
+        .back-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+        }
+        .back-btn:hover, .back-btn:focus { opacity: 0.9; }
+        
+        /* 案例列表 */
+        .case-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
+        .case-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+        .case-card:hover, .case-card:focus {
+            transform: translateY(-4px);
+        }
+        .case-card h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+        .case-card p { color: var(--text-light); font-size: 0.875rem; }
+        .tags { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.75rem; }
+        .tag {
+            background: #e0e0e0;
+            padding: 0.25rem 0.625rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        /* 弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+            padding: 1.25rem;
+            overflow-y: auto;
+        }
+        .modal.active { display: flex; justify-content: center; align-items: flex-start; }
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            max-width: 800px;
+            width: 100%;
+            margin-top: 2rem;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+        }
+        .modal video {
+            width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            margin: 1rem 0;
+            background: #000;
+        }
+        .modal .info { margin-bottom: 0.75rem; }
+        .modal .label { font-weight: 600; }
+        
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .industry-grid, .case-list {
+                grid-template-columns: 1fr;
+            }
+            header h1 { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <header role="banner">
+        <h1>📦 自动化案例库</h1>
+        <nav role="navigation" aria-label="主导航">
+            <a href="http://127.0.0.1:3000/">首页</a>
+            <a href="http://127.0.0.1:3000/admin.html">管理后台</a>
+        </nav>
+    </header>
+    
+    <main role="main" id="main">
+        <section id="industryView" class="industry-grid" aria-label="行业分类"></section>
+        <section id="caseView" style="display:none;" aria-label="案例列表">
+            <button class="back-btn" onclick="showIndustries()" aria-label="返回行业列表">← 返回行业</button>
+            <h2 id="industryTitle" style="margin-bottom:1rem;"></h2>
+            <div id="caseList" class="case-list"></div>
+        </section>
+    </main>
+
+    <dialog id="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()" aria-label="关闭弹窗">&times;</button>
+            <h2 id="modalTitle"></h2>
+            <video id="modalVideo" controls aria-label="案例视频"></video>
+            <div class="info"><span class="label">日期：</span><span id="modalDate"></span></div>
+            <div class="info"><span class="label">描述：</span><span id="modalDesc"></span></div>
+            <div class="info"><span class="label">产品：</span><span id="modalProduct"></span></div>
+            <div class="info"><span class="label">品牌：</span><span id="modalBrand"></span></div>
+            <div class="info"><span class="label">方案：</span><span id="modalScheme"></span></div>
+            <div class="tags" id="modalTags" aria-label="标签"></div>
+        </div>
+    </dialog>
+
+    <script>
+        const data = {
+            "物流": [
+                {title:"物流-电商-入库分拣-三面扫-DPD",date:"2026-03-16",desc:"物流行业，电商场景",icon:"📦",tags:["物流","电商","入库分拣","三面扫"],product:"三面扫",brand:"DPD",scheme:"入库分拣",media:"物流-电商-入库分拣-三面扫-DPD.MP4"},
+                {title:"物流-电商-分拣-侧扫-TGW",date:"2026-03-16",desc:"物流行业，电商场景",icon:"📦",tags:["物流","电商","分拣","侧扫"],product:"侧扫",brand:"TGW",scheme:"分拣",media:"物流-电商-分拣-侧扫-TGW - Side Read High Speed 2.2 m per s.mp4"},
+                {title:"物流-电商-分拣-顶扫-TGW",date:"2026-03-16",desc:"物流行业，电商场景",icon:"📦",tags:["物流","电商","分拣","顶扫"],product:"顶扫",brand:"TGW",scheme:"分拣",media:"物流-电商-分拣-顶扫-TGW - Top and Side Read high Speed.mp4"},
+                {title:"物流-电商-滑块分拣-五面扫-Amazon",date:"2026-03-16",desc:"物流行业，电商场景",icon:"📦",tags:["物流","电商","滑块分拣","五面扫"],product:"五面扫",brand:"Amazon",scheme:"滑块分拣",media:"物流-电商-滑块分拣-五面扫-Amazon.MP4"},
+                {title:"物流-轮胎-分拣-顶扫-IHLE",date:"2026-03-16",desc:"物流行业，轮胎场景",icon:"📦",tags:["物流","轮胎","分拣","顶扫"],product:"顶扫",brand:"IHLE",scheme:"分拣",media:"物流-轮胎-分拣-顶扫- IHLE.mp4"},
+                {title:"物流-鞋服-分拣-供包台快手-ocada",date:"2026-03-16",desc:"物流行业，鞋服场景",icon:"📦",tags:["物流","鞋服","分拣","供包台快手"],product:"供包台快手",brand:"ocada",scheme:"分拣",media:"物流-鞋服-分拣-供包台快手-ocada.mp4"},
+                {title:"物流-鞋服-分拣-顶扫-Jevaso",date:"2026-03-16",desc:"物流行业，鞋服场景",icon:"📦",tags:["物流","鞋服","分拣","顶扫"],product:"顶扫",brand:"Jevaso",scheme:"分拣",media:"物流-鞋服-分拣-顶扫-Jevaso.mp4"},
+                {title:"物流-鞋服-分拣-顶扫-ZALANDO",date:"2026-03-16",desc:"物流行业，鞋服场景",icon:"📦",tags:["物流","鞋服","分拣","顶扫"],product:"顶扫",brand:"ZALANDO",scheme:"分拣",media:"物流-鞋服-分拣-顶扫-ZALANDO.mp4"}
+            ],
+            "机器人": [],
+            "食品": [],
+            "服装": []
+        };// 
+            "物流": [
+                {title:"物流_分拣_交叉带_2D视觉",date:"2026-03-16",desc:"物流行业，分拣场景",icon:"📦",tags:["物流","分拣","交叉带"],product:"2D视觉",brand:"康耐视",scheme:"交叉带方案",media:"物流_分拣_交叉带_2D视觉.mov"},
+                {title:"物流_分拣_供包_机器人",date:"2026-03-16",desc:"物流行业，供包场景",icon:"📦",tags:["物流","分拣","供包"],product:"机器人",scheme:"供包方案",media:"物流_分拣_供包_机器人.mp4"},
+                {title:"物流_仓储_微型履约_机器人",date:"2026-03-16",desc:"物流行业，仓储场景",icon:"📦",tags:["物流","仓储"],product:"机器人",scheme:"微型履约方案",media:"物流_仓储_微型履约_机器人.mov"},
+                {title:"物流_机场_分拣_读码器",date:"2026-03-16",desc:"物流行业，机场场景",icon:"✈️",tags:["物流","机场"],product:"读码器",scheme:"分拣方案",media:"物流_机场_分拣_读码器.mp4"}
+            ],
+            "机器人": [
+                {title:"机器人_引导_上料_3D视觉",date:"2026-03-16",desc:"机器人行业，上料场景",icon:"🤖",tags:["机器人","引导","上料"],product:"3D视觉",brand:"梅卡曼德",scheme:"上料方案",media:"机器人_引导_上料_3D视觉.mov"}
+            ],
+            "食品": [
+                {title:"食品_包装_纸盒_机器人",date:"2026-03-16",desc:"食品行业，包装场景",icon:"🍪",tags:["食品","包装"],product:"机器人",scheme:"纸盒方案",media:"食品_包装_纸盒_机器人.mp4"}
+            ],
+            "服装": [
+                {title:"服装_质检_整理_人形机器人",date:"2026-03-16",desc:"服装行业，质检场景",icon:"👕",tags:["服装","质检"],product:"人形机器人",scheme:"整理方案",media:"服装_质检_整理_人形机器人.mp4"}
+            ]
+        };
+
+        const industryInfo = {
+            "物流": {icon:"📦",name:"物流行业",desc:"分拣、仓储、供应链"},
+            "机器人": {icon:"🤖",name:"机器人行业",desc:"引导、装配、检测"},
+            "食品": {icon:"🍪",name:"食品行业",desc:"包装、质检、分拣"},
+            "服装": {icon:"👕",name:"服装行业",desc:"质检、裁剪、缝制"}
+        };
+
+        function showIndustries() {
+            document.getElementById('industryView').style.display = 'grid';
+            document.getElementById('caseView').style.display = 'none';
+        }
+
+        function showCases(industry) {
+            document.getElementById('industryView').style.display = 'none';
+            document.getElementById('caseView').style.display = 'block';
+            document.getElementById('industryTitle').textContent = (industryInfo[industry]?.icon || '') + ' ' + industry;
+            
+            const list = document.getElementById('caseList');
+            list.innerHTML = data[industry].map((c, i) => `
+                <article class="case-card" onclick="showDetail('${industry}', ${i})" onkeydown="if(event.key==='Enter')showDetail('${industry}',${i})" tabindex="0" role="button" aria-label="${c.title}">
+                    <h3>${c.icon || '📦'} ${c.title}</h3>
+                    <p>${c.desc}</p>
+                    <div class="tags" aria-label="标签">${(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+                </article>
+            `).join('');
+        }
+
+        function showDetail(industry, idx) {
+            const c = data[industry][idx];
+            document.getElementById('modalTitle').textContent = c.title;
+            document.getElementById('modalDate').textContent = c.date || '';
+            document.getElementById('modalDesc').textContent = c.desc || '';
+            document.getElementById('modalProduct').textContent = c.product || '-';
+            document.getElementById('modalBrand').textContent = c.brand || '-';
+            document.getElementById('modalScheme').textContent = c.scheme || '-';
+            document.getElementById('modalTags').innerHTML = (c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+            
+            const video = document.getElementById('modalVideo');
+            if (c.media) {
+                video.src = c.media;
+                video.style.display = 'block';
+            } else {
+                video.style.display = 'none';
+            }
+            document.getElementById('modal').showModal();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').close();
+            document.getElementById('modalVideo').pause();
+        }
+
+        // 初始化
+        const grid = document.getElementById('industryView');
+        grid.innerHTML = Object.keys(industryInfo).map(k => `
+            <article class="industry-card" onclick="showCases('${k}')" onkeydown="if(event.key==='Enter')showCases('${k}')" tabindex="0" role="button" aria-label="${industryInfo[k].name}">
+                <div class="icon" aria-hidden="true">${industryInfo[k].icon}</div>
+                <h2>${industryInfo[k].name}</h2>
+                <p>${industryInfo[k].desc}</p>
+            </article>
+        `).join('');
+    </script>
+</body>
+</html>
